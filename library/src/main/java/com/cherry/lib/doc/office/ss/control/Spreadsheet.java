@@ -12,6 +12,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Message;
 import android.widget.LinearLayout;
 
@@ -515,8 +516,29 @@ public class Spreadsheet extends LinearLayout implements IFind, IReaderListener,
         if (sheetview == null) {
             sheetview = new SheetView(this, workbook.getSheet(0));
         }
-        sheetview.setZoom(zoom); //zoom
+
+        float oldZoom = sheetview.getZoom();
+        int oldScrollX = getScrollX();
+        int oldScrollY = getScrollY();
+
+        sheetview.setZoom(zoom); // set zoom mới
+
+        // Tính lại scroll để tránh nhảy
+        int maxX = Math.max(0, (int)(sheetview.getContentWidth() * zoom) - getWidth());
+        int maxY = Math.max(0, (int)(sheetview.getContentHeight() * zoom) - getHeight());
+
+        // Giữ tỷ lệ scroll cũ
+        int newScrollX = (int)(oldScrollX / oldZoom * zoom);
+        int newScrollY = (int)(oldScrollY / oldZoom * zoom);
+
+        scrollTo(Math.min(newScrollX, maxX), Math.min(newScrollY, maxY));
+
+        // chỉ invalidate vùng cần thiết
+        Rect visible = new Rect(getScrollX(), getScrollY(),
+                getScrollX() + getWidth(), getScrollY() + getHeight());
+        postInvalidate(visible.left, visible.top, visible.right, visible.bottom);
     }
+
 //    /**
 //     * 
 //     * @param zoom

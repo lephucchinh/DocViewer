@@ -119,6 +119,27 @@ public class SheetView {
         }
     }
 
+    public int getContentWidth() {
+        int maxColumn = sheet.getWorkbook().getMaxColumn();
+        int width = 0;
+        for (int col = 0; col < maxColumn; col++) {
+            ColumnInfo colInfo = sheet.getColumnInfo(col);
+            width += (int) ((colInfo != null ? colInfo.getColWidth() : sheet.getDefaultColWidth()) * zoom);
+        }
+        return width;
+    }
+
+    public int getContentHeight() {
+        int maxRow = sheet.getWorkbook().getMaxRow();
+        int height = 0;
+        for (int row = 0; row < maxRow; row++) {
+            Row r = sheet.getRow(row);
+            height += (int) ((r != null ? r.getRowPixelHeight() : sheet.getDefaultRowHeight()) * zoom);
+        }
+        return height;
+    }
+
+
     /**
      * 改变显示的sheet
      *
